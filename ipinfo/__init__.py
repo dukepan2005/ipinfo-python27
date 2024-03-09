@@ -1,5 +1,6 @@
+from __future__ import unicode_literals
+
 from .handler import Handler
-from .handler_async import AsyncHandler
 
 
 def getHandler(access_token=None, **kwargs):

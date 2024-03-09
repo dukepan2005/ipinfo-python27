@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import json
 
 
@@ -7,4 +9,4 @@ class APIError(Exception):
         self.error_json = error_json
 
     def __str__(self):
-        return f"APIError: {self.error_code}\n{json.dumps(self.error_json, indent=2)}"
+        return "APIError: %s\n%s" % (self.error_code, json.dumps(self.error_json, indent=2))

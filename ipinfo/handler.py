@@ -1,7 +1,7 @@
 """
 Main API client handler for fetching data from the IPinfo service.
 """
-
+from __future__ import unicode_literals
 from ipaddress import IPv4Address, IPv6Address
 import time
 
@@ -110,7 +110,7 @@ class Handler:
             pass
 
         # prepare req http opts
-        req_opts = {**self.request_options}
+        req_opts = self.request_options
         if timeout is not None:
             req_opts["timeout"] = timeout
 
@@ -216,7 +216,8 @@ class Handler:
             start_time = time.time()
 
         # prepare req http options
-        req_opts = {**self.request_options, "timeout": timeout_per_batch}
+        req_opts = self.request_options
+        req_opts.update({"timeout": timeout_per_batch})
 
         # loop over batch chunks and do lookup for each.
         url = API_URL + "/batch"
@@ -287,8 +288,8 @@ class Handler:
 
             ip_strs.append(ip)
 
-        req_opts = {**self.request_options}
-        url = f"{API_URL}/map?cli=1"
+        req_opts = self.request_options
+        url = "%s/map?cli=1" % API_URL
         headers = handler_utils.get_headers(None, self.headers)
         headers["content-type"] = "application/json"
         response = requests.post(
@@ -296,70 +297,3 @@ class Handler:
         )
         response.raise_for_status()
         return response.json()["reportUrl"]
-
-    def getBatchDetailsIter(
-        self,
-        ip_addresses,
-        batch_size=None,
-        raise_on_fail=True,
-    ):
-        if batch_size is None:
-            batch_size = BATCH_MAX_SIZE
-
-        result = {}
-        lookup_addresses = []
-        for ip_address in ip_addresses:
-            if isinstance(ip_address, IPv4Address) or isinstance(
-                ip_address, IPv6Address
-            ):
-                ip_address = ip_address.exploded
-
-            if ip_address and is_bogon(ip_address):
-                details = {}
-                details["ip"] = ip_address
-                details["bogon"] = True
-                yield Details(details)
-            else:
-                try:
-                    cached_ipaddr = self.cache[cache_key(ip_address)]
-                    result[ip_address] = cached_ipaddr
-                except KeyError:
-                    lookup_addresses.append(ip_address)
-
-        # all in cache - exit early.
-        if len(lookup_addresses) == 0:
-            raise StopIteration(result.items())
-
-        url = API_URL + "/batch"
-        headers = handler_utils.get_headers(self.access_token, self.headers)
-        headers["content-type"] = "application/json"
-        for i in range(0, len(lookup_addresses), batch_size):
-            batch = lookup_addresses[i : i + batch_size]
-
-            try:
-                response = requests.post(url, json=batch, headers=headers)
-            except Exception as e:
-                raise e
-
-            try:
-                if response.status_code == 429:
-                    raise RequestQuotaExceededError()
-                response.raise_for_status()
-            except Exception as e:
-                return handler_utils.return_or_fail(raise_on_fail, e)
-
-            details = response.json()
-
-            # format & cache
-            handler_utils.format_details(
-                details,
-                self.countries,
-                self.eu_countries,
-                self.countries_flags,
-                self.countries_currencies,
-                self.continents,
-            )
-            for ip in batch:
-                detail = details.get(ip)
-                self.cache[cache_key(ip)] = detail
-                yield detail

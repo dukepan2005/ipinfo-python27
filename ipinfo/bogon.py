@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from ipaddress import ip_network, ip_address as IP
 
 

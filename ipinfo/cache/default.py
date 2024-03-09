@@ -1,6 +1,8 @@
 """
 A default cache implementation that uses `cachetools` for an in-memory LRU cache.
 """
+# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 import cachetools
 

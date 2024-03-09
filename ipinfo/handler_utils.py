@@ -46,7 +46,7 @@ def get_headers(access_token, custom_headers):
     }
 
     if custom_headers:
-        headers = {**headers, **custom_headers}
+        headers.update(custom_headers)
 
     if access_token:
         headers["authorization"] = "Bearer {}".format(access_token)
@@ -118,4 +118,4 @@ def cache_key(k):
     """
     Transforms a user-input key into a versioned cache key.
     """
-    return f"{k}:{CACHE_KEY_VSN}"
+    return "%s:%s" % (k, CACHE_KEY_VSN)

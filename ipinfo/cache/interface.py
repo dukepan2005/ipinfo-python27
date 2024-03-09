@@ -5,8 +5,10 @@ Abstract interface for caching IPinfo data.
 import abc
 
 
-class CacheInterface(metaclass=abc.ABCMeta):
+class CacheInterface:
     """Interface for using custom cache."""
+
+    __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
     def __contains__(self, key):

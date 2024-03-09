@@ -2,6 +2,7 @@
 Details returned by the IPinfo service.
 """
 
+from __future__ import unicode_literals
 
 class Details:
     """Encapsulates data for single IP address."""
@@ -13,7 +14,7 @@ class Details:
     def __getattr__(self, attr):
         """Return attribute if it exists in details array, else return error."""
         if attr not in self.details:
-            raise AttributeError(f"{attr} is not a valid attribute of Details")
+            raise AttributeError("%s is not a valid attribute of Details" % attr)
 
         return self.details[attr]
 

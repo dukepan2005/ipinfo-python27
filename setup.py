@@ -20,7 +20,7 @@ setup(
     author_email="support@ipinfo.io",
     license="Apache License 2.0",
     packages=["ipinfo", "ipinfo.cache"],
-    install_requires=["requests", "cachetools", "aiohttp<=4"],
+    install_requires=["requests", "cachetools"],
     include_package_data=True,
     zip_safe=False,
 )

@@ -1,7 +1,6 @@
 # base
 requests>=2.18.4
 cachetools==4.2.0
-aiohttp>=3.0.0,<=4
 
 # dev
 pytest==7.1.2
